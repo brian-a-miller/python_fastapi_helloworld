@@ -1,14 +1,20 @@
-from typing import Optional
-
 from fastapi import FastAPI
+from sqlmodel import SQLModel
 
-app = FastAPI()
+# --- The App ---
+app = FastAPI(title="Hello API", version="1.0.0")
 
+# --- A SQLModel (Pydantic + SQLAlchemy combined) ---
+class Greeting(SQLModel):
+    name: str
+    message: str
 
+# --- A simple GET endpoint ---
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+def root():
+    return {"message": "Hello, World!"}
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
+# --- A GET endpoint with a path parameter ---
+@app.get("/hello/{name}", response_model=Greeting)
+def say_hello(name: str):
+    return Greeting(name=name, message=f"Hello, {name}! Welcome to the API.")
